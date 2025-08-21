@@ -233,6 +233,7 @@ export class ChainListener {
     }
 
     const jobId = `${this.chainName}-${event.transactionHash}-${event.index || 0}`;
+    const eventFirstSeenTime = Date.now();
 
     // Check if already processed
     const existingJob = this.db.getJobByUniqueId(jobId);
@@ -241,14 +242,28 @@ export class ChainListener {
       return;
     }
 
+    // Log when event is first detected
+    const eventArgs = event.args ? event.args.toObject() : {};
+    logger.info(`🔍 Event first detected`, {
+      jobId,
+      eventType: mapping.sourceEvent.eventName,
+      contractName: contractName,
+      chain: this.chainName,
+      blockNumber: event.blockNumber,
+      transactionHash: event.transactionHash,
+      eventKey: eventArgs.key || 'N/A',
+      timestamp: new Date(eventFirstSeenTime).toISOString()
+    });
+
     // Prepare event data for destination resolver.
     // Use .toObject() to get a plain object with only named properties.
     const eventData = {
       name: mapping.sourceEvent.eventName,
-      args: event.args ? event.args.toObject() : {},
+      args: eventArgs,
       blockNumber: event.blockNumber,
       transactionIndex: event.transactionIndex,
-      index: event.index || 0
+      index: event.index || 0,
+      firstSeenTime: eventFirstSeenTime
     };
 
     try {

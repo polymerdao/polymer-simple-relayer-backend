@@ -55,10 +55,20 @@ export class ProofService {
       });
 
       // Step 1: Request proof job
+      const proofStartTime = Date.now();
       const jobId = await this.requestProofJob(request);
       
       // Step 2: Poll for proof completion
       const proofResult = await this.pollForProof(jobId);
+      const proofEndTime = Date.now();
+      const proofDuration = proofEndTime - proofStartTime;
+      
+      logger.info(`⚡ Proof completed`, {
+        jobId: request.jobId || 'unknown',
+        polymerJobId: jobId,
+        proofDurationMs: proofDuration,
+        proofDurationSeconds: (proofDuration / 1000).toFixed(2)
+      });
       
       // Step 3: Convert to our internal format
       const proofResponse: ProofResponse = {

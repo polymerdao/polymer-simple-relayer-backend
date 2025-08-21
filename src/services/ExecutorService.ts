@@ -20,12 +20,16 @@ export class ExecutorService {
 
   async executeTransaction(params: ExecutionParams): Promise<string> {
     return measureTime(`execution_${this.chainName}`, async () => {
+      const executionStartTime = Date.now();
+      
       if (!this.wallet) {
         throw new Error(`No wallet configured for chain ${this.chainName}`);
       }
 
-      logger.info(`Executing transaction: ${params.method} on ${this.chainName}`, {
+      logger.info(`🚀 Starting transaction execution on ${this.chainName}`, {
         contract: params.contractAddress,
+        method: params.method,
+        jobId: params.jobId || 'unknown'
       });
 
       // Create contract instance with generated ABI
@@ -76,10 +80,16 @@ export class ExecutorService {
         throw new Error(`Transaction failed: ${tx.hash}`);
       }
 
-      logger.info('Transaction confirmed', {
+      const executionEndTime = Date.now();
+      const executionDuration = executionEndTime - executionStartTime;
+      
+      logger.info('✅ Transaction confirmed', {
         txHash: tx.hash,
         blockNumber: receipt.blockNumber,
-        gasUsed: receipt.gasUsed.toString()
+        gasUsed: receipt.gasUsed.toString(),
+        executionDurationMs: executionDuration,
+        executionDurationSeconds: (executionDuration / 1000).toFixed(2),
+        jobId: params.jobId || 'unknown'
       });
 
       metrics.increment(`executions_success_${this.chainName}`);

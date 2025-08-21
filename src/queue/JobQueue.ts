@@ -242,7 +242,22 @@ export class JobQueue {
       dest_tx_hash: txHash
     });
 
-    logger.info(`Job ${job.id} completed: ${job.mapping_name}`, { destTxHash: txHash });
+    // Calculate end-to-end timing
+    const endTime = Date.now();
+    const totalDuration = endTime - new Date(job.created_at!).getTime();
+
+    logger.info(`🎉 Job completed end-to-end`, { 
+      jobId: job.id,
+      mapping: job.mapping_name,
+      destTxHash: txHash,
+      totalDurationMs: totalDuration,
+      totalDurationSeconds: (totalDuration / 1000).toFixed(2),
+      eventKey: job.event_args ? JSON.parse(job.event_args).key : 'N/A',
+      sourceChain: job.source_chain,
+      destChain: job.dest_chain,
+      sourceBlock: job.source_block_number,
+      sourceTx: job.source_tx_hash
+    });
 
     metrics.increment(`jobs_completed_${job.dest_chain}`);
     metrics.increment(`jobs_completed_mapping_${job.mapping_name || 'unknown'}`);
