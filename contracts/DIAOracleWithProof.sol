@@ -49,13 +49,9 @@ contract DIAOracleWithProof {
     /**
      * @notice Updates the price and timestamp for a given asset key using a cross-chain proof
      * @dev Validates the proof using Polymer's CrossL2ProverV2 before updating the value
-     * @param key The asset identifier (e.g., "BTC/USD")
      * @param proof The cross-chain proof from Polymer
      */
-    function setValueWithProof(
-        string memory key,
-        bytes calldata proof
-    ) external {
+    function setValueWithProof(bytes calldata proof) external {
         // Validate the proof using Polymer's CrossL2ProverV2
         (uint32 chainId, address emittingContract, , bytes memory unindexedData) = prover.validateEvent(proof);
         
@@ -71,13 +67,7 @@ contract DIAOracleWithProof {
         
         // Decode the OracleUpdate event data
         // Event signature: OracleUpdate(string key, uint128 value, uint128 timestamp)
-        (string memory eventKey, uint128 value, uint128 timestamp) = _decodeOracleUpdateEvent(unindexedData);
-        
-        // Verify the key matches
-        require(
-            keccak256(bytes(eventKey)) == keccak256(bytes(key)),
-            "Key mismatch"
-        );
+        (string memory key, uint128 value, uint128 timestamp) = _decodeOracleUpdateEvent(unindexedData);
         
         // Check if timestamp is newer than existing value
         uint256 currentCValue = values[key];

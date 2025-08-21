@@ -1,0 +1,108 @@
+{
+  "chains": {
+    "dia": {
+      "chainId": 1050,
+      "rpc": "${DIA_RPC_URL}",
+      "privateKey": "${PRIVATE_KEY}",
+      "pollingInterval": 5000,
+      "blockConfirmations": 1,
+      "gasMultiplier": 1.1,
+      "gasLimit": "1000000"
+    },
+    "optimism": {
+      "chainId": 10,
+      "rpc": "${OPTIMISM_RPC_URL}",
+      "privateKey": "${PRIVATE_KEY}",
+      "pollingInterval": 5000,
+      "blockConfirmations": 1,
+      "gasMultiplier": 1.2,
+      "gasLimit": "2000000"
+    }
+  },
+  "contracts": {
+    "DIAOracleV2": {
+      "dia": {
+        "address": "0xd7EbD2155F2734c6F80c56979CB125712A94F61C",
+        "type": "source"
+      }
+    },
+    "DIAOracleWithProof": {
+      "optimism": {
+        "address": "${DIA_ORACLE_WITH_PROOF_ADDRESS}",
+        "type": "destination"
+      }
+    }
+  },
+  "eventMappings": [
+    {
+      "name": "DIA_OracleUpdate_Bridge",
+      "sourceEvent": {
+        "contractName": "DIAOracleV2",
+        "eventName": "OracleUpdate",
+        "eventSignature": "OracleUpdate(string key, uint128 value, uint128 timestamp)",
+        "chain": "dia"
+      },
+      "destinationCall": {
+        "contractName": "DIAOracleWithProof",
+        "methodName": "setValueWithProof",
+        "methodSignature": "setValueWithProof(bytes proof)",
+        "chain": "optimism"
+      },
+      "destinationResolver": "optimismOnly",
+      "proofRequired": true,
+      "enabled": true,
+      "processingStrategy": {
+        "type": "sequential",
+        "batchSize": 1,
+        "retryOnFailure": true,
+        "maxRetries": 3
+      }
+    }
+  ],
+  "destinationResolvers": {
+    "optimismOnly": {
+      "type": "static",
+      "destinations": ["optimism"]
+    }
+  },
+  "proofApi": {
+    "baseUrl": "https://proof.devnet.polymer.zone",
+    "apiKey": "${POLYMER_API_KEY}",
+    "timeout": 30000,
+    "retryAttempts": 3,
+    "retryDelay": 5000
+  },
+  "database": {
+    "path": "./relayer-dia.db",
+    "checkpointInterval": 100
+  },
+  "logging": {
+    "level": "info",
+    "enableFileLogging": true,
+    "logPath": "./logs/dia-oracle",
+    "maxFileSize": "10m",
+    "maxFiles": 10
+  },
+  "monitoring": {
+    "healthCheck": {
+      "enabled": true,
+      "port": 3001,
+      "path": "/health"
+    },
+    "metrics": {
+      "enabled": true,
+      "port": 9091,
+      "path": "/metrics"
+    }
+  },
+  "relayer": {
+    "name": "DIA-Oracle-Relayer",
+    "version": "1.0.0",
+    "startBlock": {
+      "dia": "latest",
+      "optimism": "latest"
+    },
+    "maxBlockRange": 1000,
+    "processingTimeout": 60000
+  }
+}
