@@ -1,0 +1,82 @@
+{
+  "chains": {
+    "optimism": {
+      "chainId": 11155420,
+      "rpc": "${OPTIMISM_RPC_URL}",
+      "privateKey": "${EVM_PRIVATE_KEY}",
+      "pollingInterval": 2000,
+      "blockConfirmations": 1,
+      "gasMultiplier": 1.1,
+      "gasLimit": "1000000"
+    },
+    "arbitrum": {
+      "chainId": 421614,
+      "rpc": "${ARBITRUM_RPC_URL}",
+      "privateKey": "${EVM_PRIVATE_KEY}",
+      "pollingInterval": 2000,
+      "blockConfirmations": 1,
+      "gasMultiplier": 1.1,
+      "gasLimit": "2000000"
+    }
+  },
+  "contracts": {
+    "Portal": {
+      "optimism": {
+        "address": "0x2Fd850CBf10F527c002ebe2f5db92A8DDe3DE9E4",
+        "type": "both"
+      },
+      "arbitrum": {
+        "address": "0x1D00893F76DFdBeDAE64077EEebA397F087Bd129",
+        "type": "both"
+      }
+    },
+    "PolymerProver": {
+      "optimism": {
+        "address": "0x6CCD4AD75EFF5Ab3d80cd4568CcAAAB32E231FD7",
+        "type": "both"
+      },
+      "arbitrum": {
+        "address": "0x5b1E8317A9f68012290fcAdFf352769D65681C91",
+        "type": "both"
+      }
+    }
+  },
+  "eventMappings": [
+    {
+      "name": "CrossChain_IntentFulfilledFromSource",
+      "sourceEvent": {
+        "contractName": "PolymerProver",
+        "eventName": "IntentFulfilledFromSource",
+        "eventSignature": "IntentFulfilledFromSource(uint64 indexed source, bytes encodedProofs)"
+      },
+      "destinationCall": {
+        "contractName": "PolymerProver",
+        "methodName": "validate",
+        "methodSignature": "validate(bytes proof)"
+      },
+      "destinationResolver": "broadcastToAll",
+      "proofRequired": true,
+      "enabled": true
+    }
+  ],
+  "destinationResolvers": {
+    "broadcastToAll": {
+      "type": "static",
+      "destinations": ["optimism", "arbitrum"]
+    }
+  },
+  "proofApi": {
+    "baseUrl": "https://proof.testnet.polymer.zone",
+    "apiKey": "${POLYMER_API_KEY}",
+    "timeout": 30000,
+    "retryAttempts": 3
+  },
+  "database": {
+    "path": "./relayer.db"
+  },
+  "logging": {
+    "level": "info",
+    "enableFileLogging": true,
+    "logPath": "./logs"
+  }
+}

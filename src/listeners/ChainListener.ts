@@ -215,6 +215,23 @@ export class ChainListener {
     mapping: EventMapping,
     contractName: string
   ) {
+    // Apply event filters if configured
+    if (mapping.eventFilter) {
+      const eventArgs = event.args ? event.args.toObject() : {};
+      
+      // Filter by key if specified (for OracleUpdate events)
+      if (mapping.eventFilter.key && Array.isArray(mapping.eventFilter.key)) {
+        const eventKey = eventArgs.key;
+        if (eventKey && !mapping.eventFilter.key.includes(eventKey)) {
+          logger.debug(`Skipping event due to key filter`, { 
+            eventKey, 
+            allowedKeys: mapping.eventFilter.key 
+          });
+          return;
+        }
+      }
+    }
+
     const jobId = `${this.chainName}-${event.transactionHash}-${event.index || 0}`;
 
     // Check if already processed

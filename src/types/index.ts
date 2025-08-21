@@ -35,6 +35,10 @@ export interface EventMapping {
   destinationResolver: string;
   proofRequired: boolean;
   enabled: boolean;
+  eventFilter?: {
+    key?: string[];
+    [key: string]: any;
+  };
 }
 
 export interface DestinationResolver {

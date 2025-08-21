@@ -295,11 +295,13 @@ class RelayerApp {
 // Start the application
 async function main() {
   try {
-    const config = loadConfig();
+    const config = loadConfig(process.env.CONFIG_PATH);
     logger.info('Configuration loaded successfully', {
       chains: Object.keys(config.chains).length,
       contracts: Object.keys(config.contracts).length,
-      mappings: config.eventMappings.length
+      mappings: config.eventMappings.length,
+      polymerApiKey: config.proofApi?.apiKey ? config.proofApi.apiKey.substring(0, 8) + '...' : 'not set',
+      polymerApiUrl: config.proofApi?.baseUrl || 'not set'
     });
 
     const app = new RelayerApp(config);

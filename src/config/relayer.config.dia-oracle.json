@@ -4,7 +4,7 @@
       "chainId": 1050,
       "rpc": "${DIA_RPC_URL}",
       "privateKey": "${PRIVATE_KEY}",
-      "pollingInterval": 5000,
+      "pollingInterval": 100,
       "blockConfirmations": 1,
       "gasMultiplier": 1.1,
       "gasLimit": "1000000"
@@ -15,8 +15,10 @@
       "privateKey": "${PRIVATE_KEY}",
       "pollingInterval": 5000,
       "blockConfirmations": 1,
-      "gasMultiplier": 1.2,
-      "gasLimit": "2000000"
+      "gasMultiplier": 1.1,
+      "gasLimit": "200000",
+      "maxFeePerGas": "2000000000",
+      "maxPriorityFeePerGas": "1000000"
     }
   },
   "contracts": {
@@ -28,7 +30,7 @@
     },
     "DIAOracleWithProof": {
       "optimism": {
-        "address": "${DIA_ORACLE_WITH_PROOF_ADDRESS}",
+        "address": "0xe2B4CCC0dd84465531725EAC3C542f271F9C9D35",
         "type": "destination"
       }
     }
@@ -51,6 +53,9 @@
       "destinationResolver": "optimismOnly",
       "proofRequired": true,
       "enabled": true,
+      "eventFilter": {
+        "key": ["ETH/USD"]
+      },
       "processingStrategy": {
         "type": "sequential",
         "batchSize": 1,
@@ -66,7 +71,7 @@
     }
   },
   "proofApi": {
-    "baseUrl": "https://proof.devnet.polymer.zone",
+    "baseUrl": "https://proof.polymer.zone",
     "apiKey": "${POLYMER_API_KEY}",
     "timeout": 30000,
     "retryAttempts": 3,

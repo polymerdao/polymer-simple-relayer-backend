@@ -1,0 +1,49 @@
+[profile.default]
+src = "contracts"
+out = "compiled-contracts"
+libs = ["node_modules", "lib"]
+remappings = [
+    "@openzeppelin/=node_modules/@openzeppelin/"
+]
+
+# Compiler settings
+solc = "0.8.26"
+optimizer = true
+optimizer_runs = 200
+via_ir = false
+
+# Network settings
+eth_rpc_url = "${ETH_RPC_URL}"
+
+# Testing
+test = "test"
+script = "script"
+broadcast = "broadcast"
+cache_path = "cache_forge"
+
+# Build settings
+auto_detect_solc = false
+ignored_error_codes = []
+deny_warnings = false
+
+# Formatting
+line_length = 120
+tab_width = 4
+bracket_spacing = true
+int_types = "long"
+multiline_func_header = "all"
+quote_style = "double"
+number_underscore = "thousands"
+wrap_comments = true
+
+[fmt]
+line_length = 120
+tab_width = 4
+bracket_spacing = true
+int_types = "long"
+quote_style = "double"
+
+[doc]
+out = "docs"
+repository = ""
+ignore = []
